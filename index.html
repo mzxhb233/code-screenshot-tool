@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码截图工具</title>
+    <!-- 引入CodeMirror 5核心库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    
+    <!-- 引入CodeMirror 5语言支持 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/java/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/shell/shell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/json/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+    
+    <!-- 引入CodeMirror 5扩展功能 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/continuelist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/display/lineNumbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/display/fullscreen.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/brace-fold.min.js"></script>
+    
+    <!-- 引入CodeMirror 5主题 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/display/fullscreen.min.css">
+    
+    <!-- 引入Highlight.js用于截图时的代码高亮 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!-- 引入所有语言支持 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/swift.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/typescript.min.js"></script>
+    <!-- 引入html2canvas用于截图 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-bottom: 1px solid #e4e7ed;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: #303133;
+            font-size: 14px;
+        }
+        
+        .control-group select,
+        .control-group input[type="color"] {
+            padding: 8px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-group select:hover,
+        .control-group input[type="color"]:hover {
+            border-color: #409eff;
+        }
+        
+        .control-group input[type="color"] {
+            width: 40px;
+            height: 36px;
+            padding: 2px;
+        }
+        
+        .buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        #generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        #clear-btn {
+            background: #909399;
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: #737579;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .input-section,
+        .output-section {
+            flex: 1;
+            background: #f5f7fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .input-section h2,
+        .output-section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #409eff;
+        }
+        
+        #code-preview {
+            width: 100%;
+            min-height: 400px;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Mac OS风格窗口 */
+        .mac-window {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .mac-header {
+            background: #2d2d2d;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mac-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .mac-button.close {
+            background: #ff5f57;
+        }
+        
+        .mac-button.minimize {
+            background: #ffbd2e;
+        }
+        
+        .mac-button.maximize {
+            background: #28ca42;
+        }
+        
+        .mac-title {
+            color: #cccccc;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .mac-content {
+            padding: 20px;
+        }
+        
+        pre {
+            margin: 0 !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+        
+        #screenshot-result {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        #screenshot-result img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .buttons {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>代码截图工具</h1>
+            <p>支持多种编程语言，生成精美Mac OS风格代码图片</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="language">编程语言：</label>
+                <select id="language">
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="go">Go</option>
+                    <option value="css">CSS</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="swift">Swift</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="html">HTML</option>
+                    <option value="sql">SQL</option>
+                    <option value="bash">Bash</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="theme">主题：</label>
+                <select id="theme">
+                    <option value="atom-one-dark">Atom One Dark</option>
+                    <option value="github">GitHub</option>
+                    <option value="monokai-sublime">Monokai Sublime</option>
+                    <option value="vs">Visual Studio</option>
+                    <option value="vs2015">Visual Studio 2015</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="window-color">窗口颜色：</label>
+                <input type="color" id="window-color" value="#1e1e1e">
+            </div>
+            
+            <div class="control-group">
+                <label for="font-size">字体大小：</label>
+                <select id="font-size">
+                    <option value="12">12px</option>
+                    <option value="14" selected>14px</option>
+                    <option value="16">16px</option>
+                    <option value="18">18px</option>
+                    <option value="20">20px</option>
+                </select>
+            </div>
+            
+            <div class="buttons">
+                <button id="clear-btn">清空代码</button>
+                <button id="generate-btn">生成截图</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2>输入代码</h2>
+                <div id="code-input-container"></div>
+            </div>
+            
+            <div class="output-section">
+                <h2>预览效果</h2>
+                <div id="code-preview">
+                    <div class="mac-window">
+                        <div class="mac-header">
+                            <div class="mac-button close"></div>
+                            <div class="mac-button minimize"></div>
+                            <div class="mac-button maximize"></div>
+                            <div class="mac-title">code.py</div>
+                        </div>
+                        <div class="mac-content">
+                            <pre><code id="highlighted-code" class="python"></code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="screenshot-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 语言映射：CodeMirror mode -> Highlight.js language
+        const languageMap = {
+            'python': 'python',
+            'java': 'text/x-java',
+            'c': 'text/x-csrc',
+            'cpp': 'text/x-c++src',
+            'go': 'text/x-go',
+            'css': 'text/css',
+            'javascript': 'text/javascript',
+            'php': 'text/x-php',
+            'ruby': 'text/x-ruby',
+            'swift': 'text/x-swift',
+            'typescript': 'text/typescript',
+            'html': 'text/html',
+            'sql': 'text/x-sql',
+            'bash': 'text/x-sh',
+            'json': 'application/json',
+            'xml': 'application/xml'
+        };
+        
+        // 初始化Highlight.js
+        hljs.highlightAll();
+        
+        // 获取DOM元素
+        const highlightedCode = document.getElementById('highlighted-code');
+        const languageSelect = document.getElementById('language');
+        const themeSelect = document.getElementById('theme');
+        const windowColor = document.getElementById('window-color');
+        const fontSize = document.getElementById('font-size');
+        const generateBtn = document.getElementById('generate-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const screenshotResult = document.getElementById('screenshot-result');
+        const macWindow = document.querySelector('.mac-window');
+        
+        // 初始化CodeMirror编辑器
+        const codeEditor = CodeMirror(document.getElementById('code-input-container'), {
+            value: `# 示例 Python 代码
+def hello_world():
+    """这是一个简单的函数"""
+    print("Hello, World!")
+    
+# 计算斐波那契数列
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# 测试函数
+if __name__ == "__main__":
+    hello_world()
+    print("斐波那契数列前10项:")
+    for i in range(10):
+        print(fibonacci(i), end=" ")`,
+            mode: languageMap[languageSelect.value],
+            theme: "atom-one-dark",
+            lineNumbers: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            styleActiveLine: true,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+        
+        // 更新代码高亮
+        function updateHighlight() {
+            const code = codeEditor.getValue();
+            const language = languageSelect.value;
+            
+            highlightedCode.className = language;
+            highlightedCode.textContent = code;
+            
+            try {
+                hljs.highlightElement(highlightedCode);
+            } catch (e) {
+                console.error('代码高亮失败:', e);
+            }
+        }
+        
+        // 切换主题
+        function changeTheme() {
+            const theme = themeSelect.value;
+            const existingLink = document.querySelector('link[href*="highlight.js/styles/"]');
+            
+            if (existingLink) {
+                existingLink.remove();
+            }
+            
+            const newLink = document.createElement('link');
+            newLink.rel = 'stylesheet';
+            newLink.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/${theme}.min.css`;
+            document.head.appendChild(newLink);
+            
+            // 更新CodeMirror主题
+            const cmTheme = theme === 'atom-one-dark' ? 'atom-one-dark' : 
+                          theme === 'github' ? 'github' : 'monokai';
+            codeEditor.setOption('theme', cmTheme);
+            
+            updateHighlight();
+        }
+        
+        // 切换编程语言
+        function changeLanguage() {
+            const language = languageSelect.value;
+            const mode = languageMap[language];
+            codeEditor.setOption('mode', mode);
+            updateHighlight();
+        }
+        
+        // 事件监听
+        codeEditor.on('change', updateHighlight);
+        languageSelect.addEventListener('change', changeLanguage);
+        themeSelect.addEventListener('change', changeTheme);
+        windowColor.addEventListener('input', (e) => {
+            macWindow.style.background = e.target.value;
+        });
+        fontSize.addEventListener('change', (e) => {
+            highlightedCode.style.fontSize = e.target.value + 'px';
+        });
+        
+        // 生成截图
+        generateBtn.addEventListener('click', async () => {
+            try {
+                const macWindowElement = document.querySelector('.mac-window');
+                
+                // 生成截图
+                const canvas = await html2canvas(macWindowElement, {
+                    backgroundColor: null,
+                    scale: 2, // 提高分辨率
+                    logging: false,
+                    useCORS: true
+                });
+                
+                // 显示结果
+                screenshotResult.innerHTML = '';
+                
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                img.alt = '代码截图';
+                
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = img.src;
+                downloadBtn.download = `code-screenshot-${Date.now()}.png`;
+                downloadBtn.className = 'download-btn';
+                downloadBtn.textContent = '下载图片';
+                
+                screenshotResult.appendChild(img);
+                screenshotResult.appendChild(downloadBtn);
+                
+            } catch (error) {
+                console.error('生成截图失败:', error);
+                alert('生成截图失败，请重试！');
+            }
+        });
+        
+        // 清空代码
+        clearBtn.addEventListener('click', () => {
+            codeEditor.setValue('');
+            updateHighlight();
+            screenshotResult.innerHTML = '';
+        });
+        
+        // 初始化
+        updateHighlight();
+        
+        // 设置编辑器高度
+        codeEditor.setSize('100%', '400px');
+    </script>
+</body>
+</html>
